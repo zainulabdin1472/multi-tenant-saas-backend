@@ -1,0 +1,27 @@
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: teamflow
+      POSTGRES_USER: teamflow_user
+      POSTGRES_PASSWORD: strongpassword
+    expose:
+      - "5432"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql+asyncpg://teamflow_user:strongpassword@postgres/teamflow
+      SECRET_KEY: ${SECRET_KEY:-your-super-secret-key-change-in-production}
+      ALGORITHM: ${ALGORITHM:-HS256}
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:
